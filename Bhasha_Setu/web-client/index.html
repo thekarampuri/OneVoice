@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhasha Setu - WebRTC Voice Call</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .user-id-display {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            word-break: break-all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        .status {
+            margin-top: 30px;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status-idle {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .status-connecting {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .logs {
+            margin-top: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .logs.show {
+            display: block;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .log-info { color: #4ec9b0; }
+        .log-success { color: #6a9955; }
+        .log-warning { color: #ce9178; }
+        .log-error { color: #f48771; }
+
+        .controls {
+            display: none;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .controls.show {
+            display: flex;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .control-btn.mute {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .control-btn.mute.active {
+            background: #ff5722;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .connecting-indicator {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Bhasha Setu</h1>
+        <p class="subtitle">WebRTC Voice Communication</p>
+
+        <div class="form-group">
+            <label>Your ID</label>
+            <div class="user-id-display" id="userId">Generating...</div>
+        </div>
+
+        <div class="form-group">
+            <label for="serverUrl">Signaling Server URL</label>
+            <input type="text" id="serverUrl" placeholder="localhost:8001" value="localhost:8001">
+        </div>
+
+        <div class="form-group">
+            <label for="callId">Call ID (Room Name)</label>
+            <input type="text" id="callId" placeholder="Enter room name" value="test-room-123">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" id="startBtn">Start Call</button>
+            <button class="btn-danger" id="endBtn" disabled>End Call</button>
+        </div>
+
+        <div class="controls" id="controls">
+            <button class="control-btn mute" id="muteBtn">🔊 Unmuted</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>Status:</strong> <span id="statusText">Ready</span>
+        </div>
+
+        <div class="logs" id="logs"></div>
+    </div>
+
+    <script src="webrtc-client.js"></script>
+</body>
+</html>

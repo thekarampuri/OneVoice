@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Old Colors -->
+    <color name="blue_dark">#0D47A1</color>
+    <color name="blue_primary">#1976D2</color>
+    <color name="blue_light">#42A5F5</color>
+    <color name="gray_text">#9E9E9E</color>
+    <color name="red_end_call">#D32F2F</color>
+    <color name="background_dark">#0A192F</color>
+    <color name="surface_dark">#112240</color>
+
+    <!-- New Theme Colors -->
+    <color name="BackgroundPrimary">#0A0E27</color>
+    <color name="BackgroundSecondary">#151B3D</color>
+    <color name="BackgroundTertiary">#1E2749</color>
+    <color name="AccentPrimary">#6C63FF</color>
+    <color name="AccentSecondary">#4ECDC4</color>
+    <color name="AccentTertiary">#FFFF6B9D</color>
+    <color name="TextPrimary">#FFFFFF</color>
+    <color name="TextSecondary">#B3FFFFFF</color>
+    <color name="TextTertiary">#80FFFFFF</color>
+    <color name="StatusError">#FF6B6B</color>
+</resources>

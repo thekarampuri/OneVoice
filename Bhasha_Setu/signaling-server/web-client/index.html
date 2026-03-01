@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Diagnostic Client</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        input {
+            padding: 8px;
+            width: 200px;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        #logs {
+            margin-top: 20px;
+            border: 1px solid #555;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background: #000;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            border-bottom: 1px solid #222;
+            padding-bottom: 2px;
+        }
+
+        .sent {
+            color: #81c784;
+        }
+
+        .received {
+            color: #64b5f6;
+        }
+
+        .error {
+            color: #e57373;
+        }
+
+        .status {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>WebRTC Diagnostic Client</h1>
+
+        <div class="status">
+            <div>Status: <span id="connectionStatus">Disconnected</span></div>
+            <div>My ID: <span id="myId">Generating...</span></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <input type="text" id="serverUrl" value="localhost:8001" placeholder="Server URL">
+            <input type="text" id="callId" value="test-room" placeholder="Call ID">
+            <button onclick="connect()">Connect</button>
+            <button onclick="disconnect()" style="background: #f44336;">Disconnect</button>
+        </div>
+
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        let ws = null;
+        let myId = crypto.randomUUID();
+        document.getElementById('myId').textContent = myId;
+
+        function log(msg, type = 'info') {
+            const logs = document.getElementById('logs');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function connect() {
+            if (ws) {
+                log('Already connected', 'error');
+                return;
+            }
+
+            const serverUrl = document.getElementById('serverUrl').value;
+            const callId = document.getElementById('callId').value;
+            const wsUrl = `ws://${serverUrl}/ws/${callId}/${myId}`;
+
+            log(`Connecting to ${wsUrl}...`);
+
+            try {
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    document.getElementById('connectionStatus').textContent = 'Connected';
+                    document.getElementById('connectionStatus').style.color = '#4CAF50';
+                    log('✅ WebSocket Connected');
+                };
+
+                ws.onmessage = (event) => {
+                    document.getElementById('logs').style.animation = 'flash 0.5s';
+                    try {
+                        const data = JSON.parse(event.data);
+                        log(`Received: ${data.type}`, 'received');
+                        console.log('Full message:', data);
+                    } catch (e) {
+                        log(`Received raw: ${event.data}`, 'received');
+                    }
+                };
+
+                ws.onclose = (event) => {
+                    document.getElementById('connectionStatus').textContent = 'Disconnected';
+                    document.getElementById('connectionStatus').style.color = '#f44336';
+                    log(`❌ Connection closed: ${event.code} ${event.reason}`, 'error');
+                    ws = null;
+                };
+
+                ws.onerror = (error) => {
+                    log('❌ WebSocket Error', 'error');
+                    console.error(error);
+                };
+
+            } catch (e) {
+                log(`❌ Exception: ${e.message}`, 'error');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+    </script>
+</body>
+
+</html>
