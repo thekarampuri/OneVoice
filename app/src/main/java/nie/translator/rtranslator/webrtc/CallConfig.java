@@ -24,7 +24,7 @@ public final class CallConfig {
      * Do NOT include a protocol prefix – SignalingClient adds ws:// itself.
      * Example: "192.168.31.29:8001"
      */
-    public static final String SIGNALING_SERVER_URL = "onevoice-signaling.onrender.com";
+    public static final String SIGNALING_SERVER_URL = "onevoice-5ytu.onrender.com";
 
     // -----------------------------------------------------------------------
     // ICE Servers (STUN + TURN)
