@@ -197,7 +197,7 @@ class SignalingClient(
         val clean = serverUrl
             .replace(Regex("^(http://|https://|ws://|wss://|/+)"), "")
             .trimEnd('/')
-        return "ws://$clean/ws/$callId/$userId"
+        return "wss://$clean/ws/$callId/$userId"
     }
 }
 

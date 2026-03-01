@@ -8,11 +8,12 @@ package nie.translator.rtranslator.webrtc;
  * (e.g. "192.168.1.10:8000").
  *
  * All ICE server credentials below are free public / metered servers that
- * work out-of-the-box.  Replace with your own TURN servers for production.
+ * work out-of-the-box. Replace with your own TURN servers for production.
  */
 public final class CallConfig {
 
-    private CallConfig() {}  // utility class – no instances
+    private CallConfig() {
+    } // utility class – no instances
 
     // -----------------------------------------------------------------------
     // Signaling Server
@@ -20,13 +21,13 @@ public final class CallConfig {
 
     /**
      * Host:port of the FastAPI WebSocket signaling server.
-     * Do NOT include a protocol prefix – SignalingClient adds  ws://  itself.
+     * Do NOT include a protocol prefix – SignalingClient adds ws:// itself.
      * Example: "192.168.31.29:8001"
      */
-    public static final String SIGNALING_SERVER_URL = "192.168.0.100:8001";
+    public static final String SIGNALING_SERVER_URL = "onevoice-signaling.onrender.com";
 
     // -----------------------------------------------------------------------
-    // ICE Servers  (STUN + TURN)
+    // ICE Servers (STUN + TURN)
     // -----------------------------------------------------------------------
 
     /** Google public STUN servers. */
@@ -36,14 +37,16 @@ public final class CallConfig {
     /** Free metered.ca TURN relay servers. */
     public static final String TURN_SERVER_URL_1 = "turn:a.relay.metered.ca:80";
     public static final String TURN_SERVER_URL_2 = "turn:a.relay.metered.ca:443";
-    public static final String TURN_USERNAME    = "87e69f8c0c87b0fc5e056a36";
-    public static final String TURN_CREDENTIAL  = "sBP6FRtpEfj3MgDL";
+    public static final String TURN_USERNAME = "87e69f8c0c87b0fc5e056a36";
+    public static final String TURN_CREDENTIAL = "sBP6FRtpEfj3MgDL";
 
     // -----------------------------------------------------------------------
     // DataChannel
     // -----------------------------------------------------------------------
 
-    /** Label of the reliable ordered DataChannel used for translated-text messages. */
+    /**
+     * Label of the reliable ordered DataChannel used for translated-text messages.
+     */
     public static final String DATA_CHANNEL_LABEL = "translation";
 
     // -----------------------------------------------------------------------
