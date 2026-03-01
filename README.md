@@ -1,55 +1,86 @@
-# Translate-Call (RTranslator)
+# 🎙️ OneVoice: Real-Time Universal Translator
 
-OneVoice is a free, open-source, and completely offline real-time translation application for Android. It allows users to have simultaneous conversations with people who speak different languages, ensuring privacy and functionality without an internet connection.
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
+[![WebRTC](https://img.shields.io/badge/Transport-WebRTC-orange.svg)](https://webrtc.org/)
 
-## Features
+**OneVoice** is a powerful, open-source Android application designed to bridge language barriers in real-time. Whether you are across the table or across the globe, OneVoice provides seamless Speech-to-Speech translation using state-of-the-art on-device AI.
 
-- **Conversation Mode:** Connect two devices via Bluetooth and have a seamless real-time conversation.
-    - **Offline Speech-to-Speech Translation:** Captures audio, translates it, and speaks it out on the other device.
-    - **Bluetooth Headset Support:** Use Bluetooth headsets for a more natural conversation experience.
-    - **Multi-Device Connection:** Connect multiple devices to translate conversations between more than two people.
-    - **Peer Profile Display:** View the profile picture of the connected user for a more personal interaction.
+---
 
-- **WalkieTalkie Mode:** A single-device mode for quick interactions.
-    - **Language Detection:** Automatically detects which of the two selected languages is being spoken.
-    - **Turn-based Translation:** Perfect for quick questions or directions.
+## 🚀 Key Translation Modes
 
-- **Text Translation Mode:** A standard text translator for quick text lookups.
+### 📱 Remote Conversation (WebRTC)
+*   **Global Reach:** Talk to anyone over the internet using our secure WebRTC signaling server.
+*   **Two-Way Sync:** Simultaneous speech recognition and translation on both devices.
+*   **Secure Transport:** Encrypted data channels for privacy.
 
-- **Privacy Focused:** All processing happens locally on the device. No data is sent to any server.
+### 📻 Walkie-Talkie Mode
+*   **Short Bursts:** Perfect for quick interactions or asking directions.
+*   **Auto-Detection:** Automatically identifies which of the two selected languages is being spoken.
+*   **Offline Ready:** Works without any internet once models are downloaded.
 
-## Tech Stack
+### 📄 Text Translation
+*   **Instant Results:** Fast, lightweight text translator for quick lookups.
+*   **Clipboard Support:** Copy/Paste and listen to translations instantly.
 
-- **Platform:** Android (Java)
-- **Minimum SDK:** Android 7.0 (API level 24)
-- **Target SDK:** Android 13 (API level 33)
-- **UI Framework:** Android View System (XML layouts)
-- **Database:** Room (SQLite)
-- **Bluetooth:** Custom [BluetoothCommunicator](cci:2://file:///e:/Projects/Translate-Call/app/src/main/java/nie/translator/rtranslator/bluetooth/BluetoothCommunicator.java:239:0-1437:1) library for robust BLE connections.
+---
 
-### AI & Machine Learning
-- **Translation:** Meta's **NLLB** (No Language Left Behind)
-    - *Model:* NLLB-Distilled-600M (Quantized to int8 with KV cache)
-- **Speech Recognition:** OpenAI's **Whisper**
-    - *Model:* Whisper-Small-244M (Quantized to int8 with KV cache)
-- **Inference Engine:** Microsoft **ONNX Runtime** (with extensions)
-- **Language Identification:** Google ML Kit (for WalkieTalkie mode)
-- **Tokenizer:** SentencePiece
+## 🏗️ Technical Architecture
 
-## Installation Process
+OneVoice uses a modern **Service-Oriented Architecture** to manage persistent translation sessions independently of the UI.
 
-1.  **Download:** Get the latest APK from the [Releases](https://github.com/thekarampuri/Translate-Call/releases) page.
-2.  **Install:** Install the APK on your Android device.
-3.  **First Launch:** Open the app. It will automatically download the necessary AI models (approx. 1.2GB).
-4.  **Permissions:** Grant the necessary permissions (Microphone, Bluetooth, Storage) when prompted.
-5.  **Offline Use:** Once models are downloaded, the app works completely offline.
+- **Frontend:** Android (Java/Kotlin) with a Fragment-based UI.
+- **Transport:** 
+    - **WebRTC:** For internet-based calls (DataChannels + Signaling).
+    - **Legacy Bluetooth:** Fallback for local P2P communication.
+- **Signaling:** FastAPI-based Python server (Bhasha_Setu) deployed on **Render.com**.
+- **Database:** Room Persistence for recent peer history and settings.
 
-*(Note: If automatic download fails, you can manually sideload models following the [Sideloading Guide](https://github.com/thekarampuri/Translate-Call/blob/main/Sideloading.md))*
+---
 
-## Supported Languages
+## 🧠 AI Magic On-Device
 
-**High Quality (NLLB & Whisper):**
-Arabic, Bulgarian, Catalan, Chinese, Croatian, Czech, Danish, Dutch, English, Finnish, French, Galician, German, Greek, Italian, Japanese, Korean, Macedonian, Polish, Portuguese, Romanian, Russian, Slovak, Spanish, Swedish, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese.
+We use **ONNX Runtime** to run heavy neural networks directly on your smartphone—ensuring your data never leaves the device.
 
-**Low Quality (Optional Enable):**
-Afrikaans, Akan, Amharic, Assamese, Bambara, Bangla, Bashkir, Basque, Belarusian, Bosnian, Dzongkha, Esperanto, Estonian, Ewe, Faroese, Fijian, Georgian, Guarani, Gujarati, Hausa, Hebrew, Hindi, Hungarian, Irish, Javanese, Kannada, Kashmiri, Kazakh, Kikuyu, Kinyarwanda, Kyrgyz, Lao, Limburghish, Lingala, Lithuanian, Luxembourghish, Tagalog, Tibetan.
+| Task | Model | Details |
+| :--- | :--- | :--- |
+| **Speech-to-Text** | **OpenAI Whisper** | Whisper-Small-244M (Quantized int8) |
+| **Translation** | **Meta NLLB-200** | Distilled-600M (Quantized int8) |
+| **Synthesis** | **Android TTS** | High-quality system-level voice output |
+| **Language ID** | **ML Kit** | Google's lightweight language detector |
+
+---
+
+## 🛠️ Getting Started
+
+### 1. Android App Setup
+1.  Clone this repository: `git clone https://github.com/thekarampuri/OneVoice.git`
+2.  Open the project in **Android Studio**.
+3.  Build and install the APK on your device.
+4.  **Note:** On first launch, the app will download ~1.2GB of neural models to provide offline functionality.
+
+### 2. Signaling Server Deployment (Signaling/Bhasha_Setu)
+OneVoice requires a signaling server to connect peers. We have a production-ready server in the `Bhasha_Setu/signaling-server` directory.
+
+- **Fastest Way:** Deploy to **Render.com** as a Web Service.
+- **Root Directory:** `Bhasha_Setu/signaling-server`
+- **Link:** Use the provided `render.yaml` for one-click blueprint deployment.
+
+---
+
+## 🌍 Supported Locales
+
+**High Quality (Whisper + NLLB):**
+English, Hindi, Marathi, Tamil, Kannada, Assamese, Bengali, Gujarati, Kashmiri, Urdu, Japanese, Korean, French, Arabic, Spanish, German, Italian, and many more (100+ total).
+
+---
+
+## 🤝 Contribution & License
+
+We welcome contributions! Feel free to open issues or submit pull requests to improve the translation accuracy or UI.
+
+**License:** Distributed under the **Apache License 2.0**. See `LICENSE` for more information.
+
+---
+*Built with ❤️ for a world without language barriers.*
