@@ -165,6 +165,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return mResults;
     }
 
+    public void clear() {
+        int size = mResults.size();
+        mResults.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
     /** The layout for each item in the RecicleView list */
     private static class ReceivedHolder extends RecyclerView.ViewHolder implements MessageHolder {
         TextView originalTextToBeTranslated;

@@ -55,6 +55,7 @@ import nie.translator.rtranslator.voice_translation.VoiceTranslationFragment;
 import nie.translator.rtranslator.voice_translation.VoiceTranslationService;
 import nie.translator.rtranslator.webrtc.WebRtcVoiceTranslationService;
 import nie.translator.rtranslator.voice_translation.VoiceTranslationActivity; // Added for activity
+import androidx.appcompat.app.AlertDialog;
 
 public class ConversationMainFragment extends VoiceTranslationFragment {
     private boolean isEditTextOpen = false;
@@ -522,10 +523,13 @@ public class ConversationMainFragment extends VoiceTranslationFragment {
                     boolean isMicAutomatic, boolean isMicActivated, int listeningMic) {
 
                 // If the bundle contains peer info (from our overridden GET_ATTRIBUTES)
-                String pName = bundle.getString("peerName");
-                String pAvatar = bundle.getString("peerAvatar");
-                if (pName != null && !pName.isEmpty()) {
-                    updatePeerUi(pName, pAvatar);
+                Bundle bundle = getArguments();
+                if (bundle != null) {
+                    String pName = bundle.getString("peerName");
+                    String pAvatar = bundle.getString("peerAvatar");
+                    if (pName != null && !pName.isEmpty()) {
+                        updatePeerUi(pName, pAvatar);
+                    }
                 }
 
                 container.setVisibility(View.VISIBLE);

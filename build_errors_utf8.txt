@@ -1,0 +1,161 @@
+﻿
+> Configure project :app
+WARNING: The option setting 'android.defaults.buildfeatures.buildconfig=true' is deprecated.
+The current default is 'false'.
+It will be removed in version 9.0 of the Android Gradle plugin.
+You can resolve this warning in Android Studio via `Refactor` > `Migrate BuildConfig to Gradle Build Files`
+
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :app:kaptDebugKotlin UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+
+> Task :app:compileDebugJavaWithJavac
+The following annotation processors are not incremental: room-compiler-2.1.0.jar (androidx.room:room-compiler:2.1.0).
+Make sure all annotation processors are incremental to improve your build speed.
+.\gradlew : warning: [options] source value 8 is obsolete and will be removed in a future release
+At line:1 char:1
++ .\gradlew compileDebugJavaWithJavac > build_errors.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: [optio... future release:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+warning: unknown enum constant Scope.LIBRARY_GROUP_PREFIX
+C:\Users\Admin\Downloads\OneVoice call app (1)\Translate-Call-main\app\src\main\java\nie\translator\rtranslator\voice_t
+ranslation\_conversation_mode\_conversation\main\ConversationMainFragment.java:117: error: cannot find symbol
+                    mAdapter.clear();
+                            ^
+  symbol:   method clear()
+  location: variable mAdapter of type MessagesAdapter
+C:\Users\Admin\Downloads\OneVoice call app (1)\Translate-Call-main\app\src\main\java\nie\translator\rtranslator\voice_t
+ranslation\_conversation_mode\_conversation\main\ConversationMainFragment.java:194: error: package AlertDialog does 
+not exist
+                    new AlertDialog.Builder(requireContext(), R.style.Theme_AppCompat_Light_Dialog_Alert)
+                                   ^
+C:\Users\Admin\Downloads\OneVoice call app (1)\Translate-Call-main\app\src\main\java\nie\translator\rtranslator\voice_t
+ranslation\_conversation_mode\_conversation\main\ConversationMainFragment.java:525: error: cannot find symbol
+                String pName = bundle.getString("peerName");
+                               ^
+  symbol: variable bundle
+C:\Users\Admin\Downloads\OneVoice call app (1)\Translate-Call-main\app\src\main\java\nie\translator\rtranslator\voice_t
+ranslation\_conversation_mode\_conversation\main\ConversationMainFragment.java:526: error: cannot find symbol
+                String pAvatar = bundle.getString("peerAvatar");
+                                 ^
+  symbol: variable bundle
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+4 errors
+83 warnings
+
+> Task :app:compileDebugJavaWithJavac FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 6s
+17 actionable tasks: 2 executed, 15 up-to-date

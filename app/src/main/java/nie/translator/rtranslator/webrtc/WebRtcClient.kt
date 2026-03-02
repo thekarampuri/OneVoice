@@ -34,8 +34,6 @@ class WebRtcClient(
 
     private var peerConnectionFactory: PeerConnectionFactory? = null
     private var peerConnection: PeerConnection? = null
-    private var localAudioTrack: AudioTrack? = null
-    private var audioSource: AudioSource? = null
 
     // DataChannel used across the connection lifetime
     private var dataChannel: DataChannel? = null
@@ -85,26 +83,14 @@ class WebRtcClient(
             .createInitializationOptions()
         PeerConnectionFactory.initialize(options)
 
-        // Initialize AudioDeviceModule
-        val audioDeviceModule = JavaAudioDeviceModule.builder(context)
-            .setUseExternalAudioDevice(false)
-            .setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
-            .createAudioDeviceModule()
-
         peerConnectionFactory = PeerConnectionFactory.builder()
-            .setAudioDeviceModule(audioDeviceModule)
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = false
                 disableNetworkMonitor = false
             })
             .createPeerConnectionFactory()
 
-        // Create AudioSource and AudioTrack
-        audioSource = peerConnectionFactory?.createAudioSource(MediaConstraints())
-        localAudioTrack = peerConnectionFactory?.createAudioTrack("ARDAMSa0", audioSource)
-        localAudioTrack?.setEnabled(true)
-
-        Log.d(tag, "✅ WebRTC initialized with audio track")
+        Log.d(tag, "✅ WebRTC initialized for DataChannel only")
     }
 
     fun createPeerConnection(isInitiator: Boolean = false) {
@@ -124,12 +110,6 @@ class WebRtcClient(
         if (peerConnection == null) {
             listener.onError("Failed to create PeerConnection")
             return
-        }
-
-        // Add local audio track to PeerConnection
-        localAudioTrack?.let {
-            peerConnection?.addTrack(it, listOf("ARDAMS"))
-            Log.d(tag, "✅ Local audio track added to PeerConnection")
         }
 
         // Initiator creates the DataChannel; answerer receives it via peerConnectionObserver.
@@ -293,7 +273,7 @@ class WebRtcClient(
     // -----------------------------------------------------------------------
 
     fun setMuted(isMuted: Boolean) {
-        localAudioTrack?.setEnabled(!isMuted)
+        // No local audio track to mute in DataChannel-only mode.
     }
 
     fun close() {
