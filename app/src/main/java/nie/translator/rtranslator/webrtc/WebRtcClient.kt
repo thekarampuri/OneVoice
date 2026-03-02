@@ -41,6 +41,11 @@ class WebRtcClient(
     // Messages queued while DataChannel is not yet OPEN
     private val pendingTranslationQueue = java.util.concurrent.ConcurrentLinkedQueue<String>()
 
+    // Audio components
+    private var audioDeviceModule: JavaAudioDeviceModule? = null
+    private var audioSource: AudioSource? = null
+    private var localAudioTrack: AudioTrack? = null
+
     // ICE servers
     private val iceServers = listOf(
         PeerConnection.IceServer.builder(CallConfig.STUN_SERVER_1).createIceServer(),
@@ -83,14 +88,26 @@ class WebRtcClient(
             .createInitializationOptions()
         PeerConnectionFactory.initialize(options)
 
+        audioDeviceModule = JavaAudioDeviceModule.builder(context)
+            .setUseHardwareAcousticEchoCanceler(true)
+            .setUseHardwareNoiseSuppressor(true)
+            .createAudioDeviceModule()
+
         peerConnectionFactory = PeerConnectionFactory.builder()
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = false
                 disableNetworkMonitor = false
             })
+            .setAudioDeviceModule(audioDeviceModule)
             .createPeerConnectionFactory()
 
-        Log.d(tag, "✅ WebRTC initialized for DataChannel only")
+        audioSource = peerConnectionFactory?.createAudioSource(MediaConstraints())
+        localAudioTrack = peerConnectionFactory?.createAudioTrack("101", audioSource)
+        
+        // --- CRITICAL FIX: Ensure no raw audio (and therefore no echo) is transmitted ---
+        localAudioTrack?.setEnabled(false)
+
+        Log.d(tag, "✅ WebRTC initialized (Audio track present but MUTED, DataChannel active)")
     }
 
     fun createPeerConnection(isInitiator: Boolean = false) {
@@ -110,6 +127,10 @@ class WebRtcClient(
         if (peerConnection == null) {
             listener.onError("Failed to create PeerConnection")
             return
+        }
+
+        localAudioTrack?.let {
+            peerConnection?.addTrack(it)
         }
 
         // Initiator creates the DataChannel; answerer receives it via peerConnectionObserver.
@@ -273,7 +294,8 @@ class WebRtcClient(
     // -----------------------------------------------------------------------
 
     fun setMuted(isMuted: Boolean) {
-        // No local audio track to mute in DataChannel-only mode.
+        // Track is permanently muted to avoid echo, but this function exists for interface compliance
+        Log.d(tag, "setMuted called ($isMuted) but track is permanently muted to avoid echo.")
     }
 
     fun close() {
@@ -282,6 +304,8 @@ class WebRtcClient(
         dataChannel?.close()
         dataChannel = null
         peerConnection?.close()
+        audioSource?.dispose()
+        audioDeviceModule?.release()
         peerConnectionFactory?.dispose()
     }
 
