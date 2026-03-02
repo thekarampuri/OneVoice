@@ -29,11 +29,11 @@
     <color name="secondaryTransparent">#32F72585</color>
     
     <!-- Background Colors - Half White Theme -->
-    <color name="background_primary">#FFFFFF</color>   <!-- Pure White -->
-    <color name="background_secondary">#F8F9FA</color> <!-- Off-White -->
-    <color name="background_tertiary">#E9ECEF</color>  <!-- Light Gray-White -->
-    <color name="background_discover">#5A7B2CBF</color>
-    <color name="background_advertize">#5A7B2CBF</color>
+    <color name="background_primary">#F8F9FA</color>   <!-- Clean Light Gray -->
+    <color name="background_secondary">#FFFFFF</color> <!-- Pure White -->
+    <color name="background_tertiary">#E9ECEF</color>  <!-- Muted Gray -->
+    <color name="background_discover">#1A7B2CBF</color>
+    <color name="background_advertize">#1A7B2CBF</color>
     
     <!-- Interactive States -->
     <color name="pressed_color">#E0AAFF</color>        <!-- Light Purple on Press -->

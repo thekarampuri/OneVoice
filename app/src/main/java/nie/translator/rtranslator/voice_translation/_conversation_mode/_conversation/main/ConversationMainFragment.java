@@ -103,6 +103,22 @@ public class ConversationMainFragment extends VoiceTranslationFragment {
                     micInput.setText(getResources().getString(R.string.mic));
                 }
             }
+
+            @Override
+            public void onPeerInfoReceived(String name, String avatar) {
+                super.onPeerInfoReceived(name, avatar);
+                updatePeerUi(name, avatar);
+            }
+
+            @Override
+            public void onClearChat() {
+                super.onClearChat();
+                if (mAdapter != null) {
+                    mAdapter.clear();
+                    description.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.GONE);
+                }
+            }
         };
     }
 
@@ -157,14 +173,30 @@ public class ConversationMainFragment extends VoiceTranslationFragment {
         peerName = view.findViewById(R.id.peer_name);
         peerStatus = view.findViewById(R.id.peer_status);
 
-        Button endCallButton = view.findViewById(R.id.button_end_call);
-        if (endCallButton != null) {
-            endCallButton.setOnClickListener(new View.OnClickListener() {
+        Button buttonEndCall = view.findViewById(R.id.button_end_call);
+        ImageButton buttonClearChat = view.findViewById(R.id.button_clear_chat);
+
+        if (buttonEndCall != null) {
+            buttonEndCall.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (activity != null) {
                         activity.endWebRtcCall();
                     }
+                }
+            });
+        }
+
+        if (buttonClearChat != null) {
+            buttonClearChat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new AlertDialog.Builder(requireContext(), R.style.Theme_AppCompat_Light_Dialog_Alert)
+                            .setTitle("Clear Chat")
+                            .setMessage("Are you sure you want to clear the conversation history?")
+                            .setPositiveButton("Clear", (dialog, which) -> clearChat())
+                            .setNegativeButton("Cancel", null)
+                            .show();
                 }
             });
         }
@@ -488,6 +520,14 @@ public class ConversationMainFragment extends VoiceTranslationFragment {
             public void onSuccess(ArrayList<GuiMessage> messages, boolean isMicMute, boolean isAudioMute,
                     boolean isTTSError, final boolean isEditTextOpen, boolean isBluetoothHeadsetConnected,
                     boolean isMicAutomatic, boolean isMicActivated, int listeningMic) {
+
+                // If the bundle contains peer info (from our overridden GET_ATTRIBUTES)
+                String pName = bundle.getString("peerName");
+                String pAvatar = bundle.getString("peerAvatar");
+                if (pName != null && !pName.isEmpty()) {
+                    updatePeerUi(pName, pAvatar);
+                }
+
                 container.setVisibility(View.VISIBLE);
                 // initialization with service values
                 mAdapter = new MessagesAdapter(messages, global, new MessagesAdapter.Callback() {
@@ -597,6 +637,23 @@ public class ConversationMainFragment extends VoiceTranslationFragment {
 
     public void setInputActive(boolean inputActive) {
         isInputActive = inputActive;
+    }
+
+    public void clearChat() {
+        if (conversationServiceCommunicator != null) {
+            conversationServiceCommunicator.clearChat();
+        }
+    }
+
+    private void updatePeerUi(String name, String avatar) {
+        if (activity != null && peerName != null) {
+            activity.runOnUiThread(() -> {
+                peerName.setText(name);
+                peerStatus.setText("Connected");
+                peerProfileCard.setVisibility(View.VISIBLE);
+                // avatar loading logic could go here
+            });
+        }
     }
 
     /**

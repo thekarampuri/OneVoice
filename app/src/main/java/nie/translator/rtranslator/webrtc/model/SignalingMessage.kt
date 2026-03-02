@@ -14,7 +14,9 @@ sealed interface SignalingMessage {
 /** JOIN — client joins a call room. */
 data class JoinMessage(
     override val callId: String,
-    val userId: String
+    val userId: String,
+    val name: String? = null,
+    val avatar: String? = null
 ) : SignalingMessage {
     override val type: String = "join"
 }
@@ -22,7 +24,9 @@ data class JoinMessage(
 /** PEER_JOINED — server notifies that a peer joined. */
 data class PeerJoinedMessage(
     override val callId: String,
-    val peerId: String?
+    val peerId: String?,
+    val name: String? = null,
+    val avatar: String? = null
 ) : SignalingMessage {
     override val type: String = "peer-joined"
 }
@@ -81,4 +85,13 @@ data class ErrorMessage(
 ) : SignalingMessage {
     override val type: String = "error"
     override val callId: String = ""
+}
+
+/** PEER_INFO — client sends metadata to peer. */
+data class PeerInfoMessage(
+    override val callId: String,
+    val name: String,
+    val avatar: String? = null
+) : SignalingMessage {
+    override val type: String = "peer-info"
 }

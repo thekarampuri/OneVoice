@@ -35,11 +35,15 @@ import java.util.ArrayList;
 import nie.translator.rtranslator.Global;
 import nie.translator.rtranslator.R;
 
-/** Is used to connect to the RecycleView, which functions as a ListView, a list of strings, which will be inserted in the ViewHolder layout and this will be inserted in the list**/
+/**
+ * Is used to connect to the RecycleView, which functions as a ListView, a list
+ * of strings, which will be inserted in the ViewHolder layout and this will be
+ * inserted in the list
+ **/
 public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int MINE = 0;
     private static final int NON_MINE = 1;
-    //private static final int PREVIEW = 2;
+    // private static final int PREVIEW = 2;
     private ArrayList<GuiMessage> mResults = new ArrayList<>();
     private Callback callback;
 
@@ -54,7 +58,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mResults.addAll(messages);
             notifyItemRangeInserted(0, messages.size() - 1);
         }
-        showOriginalTranscriptionMsg = application.getSharedPreferences("default", Context.MODE_PRIVATE).getBoolean("ShowOriginalTranscriptionMsgPreference", false);
+        showOriginalTranscriptionMsg = application.getSharedPreferences("default", Context.MODE_PRIVATE)
+                .getBoolean("ShowOriginalTranscriptionMsgPreference", false);
     }
 
     @NonNull
@@ -66,7 +71,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case NON_MINE:
                 return new ReceivedHolder(LayoutInflater.from(parent.getContext()), parent);
         }
-        return new SendHolder(LayoutInflater.from(parent.getContext()), parent);  // to not return null
+        return new SendHolder(LayoutInflater.from(parent.getContext()), parent); // to not return null
     }
 
     @Override
@@ -81,7 +86,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             ((MessageHolder) holder).setText(message.getMessage().getTextToTranslate(), message.getMessage().getText());
             Log.d("recyclerview", "RecyclerView bind text");
-            //holder.itemView.requestLayout();
+            // holder.itemView.requestLayout();
         }
     }
 
@@ -125,13 +130,13 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public void setMessage(int index, GuiMessage message) {
         mResults.set(index, message);
-        //notifyItemRangeChanged(0, getItemCount());
+        // notifyItemRangeChanged(0, getItemCount());
         notifyItemChanged(index);
     }
 
-    public int getMessageIndex(long messageID){
-        for(int i = 0; i < mResults.size(); i++){
-            if(mResults.get(i).getMessageID() == messageID){
+    public int getMessageIndex(long messageID) {
+        for (int i = 0; i < mResults.size(); i++) {
+            if (mResults.get(i).getMessageID() == messageID) {
                 return i;
             }
         }
@@ -139,9 +144,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Nullable
-    public GuiMessage getMessage(long messageID){
-        for(int i = 0; i < mResults.size(); i++){
-            if(mResults.get(i).getMessageID() == messageID){
+    public GuiMessage getMessage(long messageID) {
+        for (int i = 0; i < mResults.size(); i++) {
+            if (mResults.get(i).getMessageID() == messageID) {
                 return mResults.get(i);
             }
         }
@@ -160,7 +165,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return mResults;
     }
 
-    /** The layout for each item in the RecicleView list*/
+    /** The layout for each item in the RecicleView list */
     private static class ReceivedHolder extends RecyclerView.ViewHolder implements MessageHolder {
         TextView originalTextToBeTranslated;
         TextView text;
@@ -189,7 +194,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    /** The layout for each item in the RecicleView list*/
+    /** The layout for each item in the RecicleView list */
     private static class SendHolder extends RecyclerView.ViewHolder implements MessageHolder {
         TextView originalTextToBeTranslated;
         TextView text;

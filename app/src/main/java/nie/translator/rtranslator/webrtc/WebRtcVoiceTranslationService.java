@@ -344,6 +344,16 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
         isInitiator = true;
         webRtcClient.createPeerConnection(true);
         webRtcClient.createOffer();
+        sendLocalPeerInfo();
+    }
+
+    private void sendLocalPeerInfo() {
+        if (signalingClient != null && callId != null) {
+            String name = global.getName();
+            // In a real app we'd load the avatar URI or Base64 here.
+            // For now we just send the name.
+            signalingClient.sendPeerInfo(callId, name, null);
+        }
     }
 
     /**
@@ -357,6 +367,20 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
         cancelStopSelf();
         isInitiator = false;
         webRtcClient.createPeerConnection(false);
+        sendLocalPeerInfo();
+    }
+
+    @Override
+    public void onPeerInfoReceived(String name, String avatar) {
+        Log.d(TAG, "👤 Peer info received in service: " + name);
+        this.peerName = name;
+        this.peerAvatar = avatar;
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("callback", ON_PEER_INFO_RECEIVED);
+        bundle.putString("name", name);
+        bundle.putString("avatar", avatar);
+        notifyToClient(bundle);
     }
 
     @Override
@@ -550,6 +574,52 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
             Log.d(TAG, "📤 Sending raw text to peer: lang=" + sourceLanguage.getCode()
                     + "  text=" + originalText.substring(0, Math.min(40, originalText.length())));
             webRtcClient.sendTranslationMessage(originalText, sourceLanguage.getCode());
+        }
+    }
+
+    @Override
+    protected boolean executeCommand(int command, Bundle data) {
+        if (command == GET_ATTRIBUTES) {
+            // Intercept GET_ATTRIBUTES to add peer info
+            Bundle bundle = new Bundle();
+            bundle.putInt("callback", ON_ATTRIBUTES);
+            bundle.putParcelableArrayList("messages", getMessages());
+            bundle.putBoolean("isMicMute", isMicMute);
+            bundle.putBoolean("isAudioMute", isAudioMute);
+            bundle.putBoolean("isTTSError", tts == null);
+            bundle.putBoolean("isEditTextOpen", isEditTextOpen);
+            bundle.putBoolean("isBluetoothHeadsetConnected", isBluetoothHeadsetConnected());
+            bundle.putBoolean("isMicAutomatic", isMicAutomatic);
+            bundle.putBoolean("isMicActivated", isMicActivated);
+            bundle.putString("peerName", peerName);
+            bundle.putString("peerAvatar", peerAvatar);
+
+            if (mVoiceRecorder != null && mVoiceRecorder.isRecording()) {
+                if (manualRecognizingFirstLanguage) {
+                    bundle.putInt("listeningMic", FIRST_LANGUAGE);
+                } else if (manualRecognizingSecondLanguage) {
+                    bundle.putInt("listeningMic", SECOND_LANGUAGE);
+                } else {
+                    bundle.putInt("listeningMic", AUTO_LANGUAGE);
+                }
+            } else {
+                bundle.putInt("listeningMic", -1);
+            }
+            notifyToClient(bundle);
+            return true;
+        }
+        return super.executeCommand(command, data);
+    }
+
+    // Helper to get messages from parent via reflection or change messages access
+    // modifier
+    private ArrayList<GuiMessage> getMessages() {
+        try {
+            java.lang.reflect.Field field = VoiceTranslationService.class.getDeclaredField("messages");
+            field.setAccessible(true);
+            return (ArrayList<GuiMessage>) field.get(this);
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
     }
 

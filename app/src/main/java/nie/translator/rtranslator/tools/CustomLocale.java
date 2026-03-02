@@ -158,9 +158,9 @@ public class CustomLocale implements Comparable<CustomLocale>, Serializable {
         String name = locale.getDisplayName();
         name = name.substring(0, 1).toUpperCase(locale) + name.substring(1); // we convert the first letter to uppercase
         if (containsLanguage(ttsLanguages, CustomLocale.getInstance(locale.getLanguage()))) {
-            return name;
+            return name + " (Supports Voice)";
         } else {
-            return name + " (TTS not supported)"; // Notice that users cannot use TTS for this language.
+            return name + " (No Voice)"; // Notice that users cannot use TTS for this language.
         }
     }
 
@@ -171,14 +171,14 @@ public class CustomLocale implements Comparable<CustomLocale>, Serializable {
         boolean hasTTS = containsLanguage(ttsLanguages, CustomLocale.getInstance(locale.getLanguage()));
         boolean hasSTT = containsLanguage(sttLanguages, CustomLocale.getInstance(locale.getLanguage()));
 
-        if (!hasTTS && !hasSTT) {
-            return name + " (TTS & STT not supported)";
-        } else if (!hasTTS) {
-            return name + " (TTS not supported)";
-        } else if (!hasSTT) {
+        if (hasTTS && hasSTT) {
+            return name + " (Supports Voice)";
+        } else if (hasTTS) {
             return name + " (STT not supported)";
+        } else if (hasSTT) {
+            return name + " (TTS not supported)";
         } else {
-            return name;
+            return name + " (No Voice)";
         }
     }
 

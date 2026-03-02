@@ -77,7 +77,7 @@ class WebRtcClient(
     // -----------------------------------------------------------------------
 
     fun initialize() {
-        Log.d(tag, "Initializing WebRTC (DataChannel only)…")
+        Log.d(tag, "Initializing WebRTC audio…")
 
         val options = PeerConnectionFactory.InitializationOptions.builder(context)
             .setEnableInternalTracer(false)
@@ -85,14 +85,26 @@ class WebRtcClient(
             .createInitializationOptions()
         PeerConnectionFactory.initialize(options)
 
+        // Initialize AudioDeviceModule
+        val audioDeviceModule = JavaAudioDeviceModule.builder(context)
+            .setUseExternalAudioDevice(false)
+            .setAudioSource(android.media.MediaRecorder.AudioSource.MIC)
+            .createAudioDeviceModule()
+
         peerConnectionFactory = PeerConnectionFactory.builder()
+            .setAudioDeviceModule(audioDeviceModule)
             .setOptions(PeerConnectionFactory.Options().apply {
                 disableEncryption = false
                 disableNetworkMonitor = false
             })
             .createPeerConnectionFactory()
 
-        Log.d(tag, "✅ WebRTC initialized")
+        // Create AudioSource and AudioTrack
+        audioSource = peerConnectionFactory?.createAudioSource(MediaConstraints())
+        localAudioTrack = peerConnectionFactory?.createAudioTrack("ARDAMSa0", audioSource)
+        localAudioTrack?.setEnabled(true)
+
+        Log.d(tag, "✅ WebRTC initialized with audio track")
     }
 
     fun createPeerConnection(isInitiator: Boolean = false) {
@@ -112,6 +124,12 @@ class WebRtcClient(
         if (peerConnection == null) {
             listener.onError("Failed to create PeerConnection")
             return
+        }
+
+        // Add local audio track to PeerConnection
+        localAudioTrack?.let {
+            peerConnection?.addTrack(it, listOf("ARDAMS"))
+            Log.d(tag, "✅ Local audio track added to PeerConnection")
         }
 
         // Initiator creates the DataChannel; answerer receives it via peerConnectionObserver.

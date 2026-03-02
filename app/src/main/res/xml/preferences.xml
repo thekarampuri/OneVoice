@@ -86,7 +86,7 @@
         app:iconSpaceReserved="false"
         app:allowDividerAbove="true">
         <nie.translator.rtranslator.settings.ShowOriginalTranscriptionMsgPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="ShowOriginalTranscriptionMsgPreference"
             android:title="@string/preference_title_show_original_transcription"
             android:summary="@string/preference_description_show_original_transcription_msg_preference"

@@ -159,14 +159,7 @@ async def websocket_endpoint(websocket: WebSocket, call_id: str, user_id: str):
                     continue
                 
                 # Relay message to peer
-                if msg_type in ["offer", "answer", "ice-candidate"]:
-                    # Additional validation for ICE candidates
-                    if msg_type == "ice-candidate":
-                        if "candidate" not in message:
-                            log(f"⚠️  Invalid ICE candidate from {user_id[:8]}: missing candidate field")
-                            continue
-                        log(f"🧊 Relaying ICE candidate from {user_id[:8]}")
-                    
+                if msg_type in ["offer", "answer", "ice-candidate", "peer-info"]:
                     success = await send_to_peer(call_id, user_id, message)
                     if not success:
                         log(f"⚠️  Failed to relay {msg_type} from {user_id[:8]} (peer not found)")
@@ -191,18 +184,18 @@ async def websocket_endpoint(websocket: WebSocket, call_id: str, user_id: str):
 
 
 async def keepalive(websocket: WebSocket, user_id: str):
-    """Send periodic ping to keep connection alive"""
+    """Send periodic heartbeat to keep connection alive"""
     try:
         while True:
-            await asyncio.sleep(20)  # Ping every 20 seconds
+            await asyncio.sleep(15)  # Ping more frequently for Render
             try:
-                await websocket.send_text(json.dumps({"type": "ping"}))
-                log(f"🏓 Ping sent to {user_id[:8]}")
+                await websocket.send_text(json.dumps({"type": "ping", "timestamp": datetime.now().isoformat()}))
+                # log(f"🏓 Ping sent to {user_id[:8]}")
             except Exception as e:
-                log(f"⚠️  Failed to ping {user_id[:8]}: {e}")
+                log(f"⚠️  Keepalive failed for {user_id[:8]}: {e}")
                 break
     except asyncio.CancelledError:
-        log(f"Keepalive cancelled for {user_id[:8]}")
+        pass
 
 
 def get_peer_id(call_id: str, user_id: str) -> Optional[str]:

@@ -35,10 +35,11 @@ class SignalingClient(
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(0, TimeUnit.MILLISECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
-        .pingInterval(20, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .pingInterval(10, TimeUnit.SECONDS)
         .build()
 
     // -----------------------------------------------------------------------
@@ -99,6 +100,11 @@ class SignalingClient(
     /** Send ICE candidate. */
     fun sendIceCandidate(callId: String, candidate: nie.translator.rtranslator.webrtc.model.IceCandidate) {
         sendMessage(IceCandidateMessage(callId = callId, candidate = candidate))
+    }
+
+    /** Send peer info (name, avatar). */
+    fun sendPeerInfo(callId: String, name: String, avatar: String?) {
+        sendMessage(PeerInfoMessage(callId = callId, name = name, avatar = avatar))
     }
 
     /** Disconnect and release resources. */
@@ -170,6 +176,13 @@ class SignalingClient(
                     listener.onIceCandidateReceived(candidate)
                 }
 
+                "peer-info" -> {
+                    val name = json.get("name")?.asString ?: "Unknown"
+                    val avatar = json.get("avatar")?.asString
+                    Log.d(tag, "👤 Peer info received: $name")
+                    listener.onPeerInfoReceived(name, avatar)
+                }
+
                 "peer-left" -> {
                     val peerId = json.get("peerId")?.asString ?: return
                     Log.d(tag, "👋 Peer left: $peerId")
@@ -207,6 +220,7 @@ class SignalingClient(
 interface SignalingListener {
     fun onConnected()
     fun onPeerJoined(peerId: String?)
+    fun onPeerInfoReceived(name: String, avatar: String?)
     fun onExistingPeer(peerId: String?)
     fun onOfferReceived(sdp: String)
     fun onAnswerReceived(sdp: String)
