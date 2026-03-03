@@ -557,6 +557,17 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     }
 
     // -------------------------------------------------------------------------
+    // Full-duplex: keep mic active while TTS plays translated audio.
+    // No raw audio is transmitted (audio track is muted in WebRtcClient),
+    // so echo only affects local STT — acceptable trade-off for full-duplex.
+    // -------------------------------------------------------------------------
+
+    @Override
+    protected boolean shouldDeactivateMicDuringTTS() {
+        return false;
+    }
+
+    // -------------------------------------------------------------------------
     // Send helper — called after local STT + translate produces final text
     // -------------------------------------------------------------------------
 

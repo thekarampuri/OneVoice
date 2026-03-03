@@ -89,3 +89,6 @@ lint-results.xml
 
 # Build logs
 build_log*.txt
+
+# Python Virtual Environments
+Backend/venv/
