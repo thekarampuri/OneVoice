@@ -34,11 +34,11 @@ public final class CallConfig {
     public static final String STUN_SERVER_1 = "stun:stun.l.google.com:19302";
     public static final String STUN_SERVER_2 = "stun:stun1.l.google.com:19302";
 
-    /** Free metered.ca TURN relay servers. */
-    public static final String TURN_SERVER_URL_1 = "turn:a.relay.metered.ca:80";
-    public static final String TURN_SERVER_URL_2 = "turn:a.relay.metered.ca:443";
-    public static final String TURN_USERNAME = "87e69f8c0c87b0fc5e056a36";
-    public static final String TURN_CREDENTIAL = "sBP6FRtpEfj3MgDL";
+    /** Free public OpenRelay TURN servers (no expiration). */
+    public static final String TURN_SERVER_URL_1 = "turn:openrelay.metered.ca:80";
+    public static final String TURN_SERVER_URL_2 = "turn:openrelay.metered.ca:443";
+    public static final String TURN_USERNAME = "openrelayproject";
+    public static final String TURN_CREDENTIAL = "openrelayproject";
 
     // -----------------------------------------------------------------------
     // DataChannel

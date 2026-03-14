@@ -20,9 +20,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.animation.AnticipateInterpolator;
+import androidx.annotation.NonNull;
+import android.animation.ObjectAnimator;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
@@ -44,6 +50,8 @@ public class LoadingActivity extends GeneralActivity {
     private Global global;
     private boolean startingActivity = false;
     private boolean showingError = false;
+    private long startTime;
+    private final long SPLASH_DURATION = 3000; // 3 seconds
 
     public LoadingActivity() {
         // Required empty public constructor
@@ -63,14 +71,39 @@ public class LoadingActivity extends GeneralActivity {
         }
         setContentView(R.layout.activity_loading);
         mainHandler = new Handler(Looper.getMainLooper());
+        startTime = System.currentTimeMillis();
 
         // Keep the splash screen visible for this Activity.
         if(splashScreen != null) {
             splashScreen.setKeepOnScreenCondition(new SplashScreen.KeepOnScreenCondition() {
                 @Override
                 public boolean shouldKeepOnScreen() {
-                    return !showingError;
+                    long currentTime = System.currentTimeMillis();
+                    return currentTime - startTime < SPLASH_DURATION && !showingError;
                 }
+            });
+
+            // Set the exit animation for the splash screen
+            splashScreen.setOnExitAnimationListener(splashScreenProvider -> {
+                final View splashScreenView = splashScreenProvider.getView();
+                ObjectAnimator fadeOut = ObjectAnimator.ofFloat(
+                        splashScreenView,
+                        View.ALPHA,
+                        1f,
+                        0f
+                );
+                fadeOut.setInterpolator(new AnticipateInterpolator());
+                fadeOut.setDuration(500L);
+
+                // Call splashScreenProvider.remove() at the end of the animation.
+                fadeOut.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        splashScreenProvider.remove();
+                    }
+                });
+
+                fadeOut.start();
             });
         }
     }

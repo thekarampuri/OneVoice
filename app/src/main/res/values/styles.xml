@@ -46,9 +46,9 @@
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen.IconBackground">
         <!-- Set the splash screen background -->
-        <item name="windowSplashScreenBackground">@android:color/white</item>
+        <item name="windowSplashScreenBackground">@drawable/splash_background</item>
         <!-- Set a background behind the splash screen icon. -->
-        <item name="windowSplashScreenIconBackgroundColor">@android:color/white</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/primary_very_dark</item>
         <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated drawable. -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen2</item>
         <!-- Set the theme of the Activity that follows your splash screen. -->

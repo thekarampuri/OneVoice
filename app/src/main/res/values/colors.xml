@@ -16,33 +16,33 @@
     *-->
 
 <resources>
-    <!-- Primary Purple Colors -->
-    <color name="primary">#7B2CBF</color>              <!-- Deep Purple -->
-    <color name="primary_dark">#5A189A</color>         <!-- Darker Purple -->
-    <color name="primary_very_dark">#3C096C</color>    <!-- Very Dark Purple -->
-    <color name="primary_lite">#9D4EDD</color>         <!-- Light Purple -->
-    <color name="primary_very_lite">#E0AAFF</color>    <!-- Very Light Purple -->
+    <!-- Primary Coffee Colors -->
+    <color name="primary">#3E2723</color>
+    <color name="primary_dark">#21100A</color>
+    <color name="primary_very_dark">#1A0C08</color>
+    <color name="primary_lite">#5D4037</color>
+    <color name="primary_very_lite">#EFEBE9</color>
     
     <!-- Accent Colors -->
-    <color name="accent">#C77DFF</color>               <!-- Bright Purple Accent -->
-    <color name="secondary">#F72585</color>            <!-- Pink Accent -->
-    <color name="secondaryTransparent">#32F72585</color>
+    <color name="accent">#8D6E63</color>
+    <color name="secondary">#D4AF37</color>
+    <color name="secondaryTransparent">#32D4AF37</color>
     
-    <!-- Background Colors - Half White Theme -->
-    <color name="background_primary">#F8F9FA</color>   <!-- Clean Light Gray -->
-    <color name="background_secondary">#FFFFFF</color> <!-- Pure White -->
-    <color name="background_tertiary">#E9ECEF</color>  <!-- Muted Gray -->
-    <color name="background_discover">#1A7B2CBF</color>
-    <color name="background_advertize">#1A7B2CBF</color>
+    <!-- Background Colors -->
+    <color name="background_primary">#FAF8F5</color>
+    <color name="background_secondary">#FCFBF8</color>
+    <color name="background_tertiary">#EFEBE9</color>
+    <color name="background_discover">#1A3E2723</color>
+    <color name="background_advertize">#1A3E2723</color>
     
     <!-- Interactive States -->
-    <color name="pressed_color">#E0AAFF</color>        <!-- Light Purple on Press -->
-    <color name="ripple_color">#40C77DFF</color>       <!-- Purple Ripple (25% opacity) -->
+    <color name="pressed_color">#D7CCC8</color>
+    <color name="ripple_color">#408D6E63</color>
     
     <!-- Text Colors -->
-    <color name="primary_text_color">#212529</color>   <!-- Dark Text -->
-    <color name="secondary_text_color">#6C757D</color> <!-- Gray Text -->
-    <color name="text_on_purple">#FFFFFF</color>       <!-- White Text on Purple -->
+    <color name="primary_text_color">#3E2723</color>
+    <color name="secondary_text_color">#5D4037</color>
+    <color name="text_on_purple">#FFFFFF</color>
     
     <!-- Grayscale -->
     <color name="black">#212121</color>
@@ -56,10 +56,14 @@
     <color name="very_light_gray2">#E9E9E9</color>
     <color name="very_very_light_gray">#F5F5F5</color>
     <color name="white">#fafafa</color>
-    <color name="accent_white">#ffffff</color>
+    <color name="accent_white">#FAFAFA</color>
     
     <!-- Status Colors -->
     <color name="red">#d50000</color>
     <color name="yellow">#ffd600</color>
     <color name="green">#00c853</color>
+
+    <!-- Glassmorphism -->
+    <color name="glass_beige">#B3EFEBE9</color>
+    <color name="glass_stroke">#4DFFFFFF</color>
 </resources>
