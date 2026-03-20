@@ -292,6 +292,15 @@ public abstract class VoiceTranslationService extends GeneralService {
         }
     }
 
+    public int setTtsAudioAttributes(android.media.AudioAttributes attributes) {
+        synchronized (mLock) {
+            if (tts != null) {
+                return tts.setAudioAttributes(attributes);
+            }
+            return android.speech.tts.TextToSpeech.ERROR;
+        }
+    }
+
     protected boolean shouldDeactivateMicDuringTTS() {
         return true;
     }

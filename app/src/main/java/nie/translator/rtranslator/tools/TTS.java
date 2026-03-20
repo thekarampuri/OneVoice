@@ -122,9 +122,16 @@ public class TTS {
         return TextToSpeech.ERROR;
     }
 
+    public int setAudioAttributes(android.media.AudioAttributes attributes) {
+        if (isActive()) {
+            return tts.setAudioAttributes(attributes);
+        }
+        return TextToSpeech.ERROR;
+    }
+
     public int setLanguage(CustomLocale loc, Context context) {
         if (isActive()) {
-            return tts.setLanguage(new Locale(loc.getLocale().getLanguage()));
+            return tts.setLanguage(loc.getLocale());
         }
         return TextToSpeech.ERROR;
     }
@@ -148,9 +155,9 @@ public class TTS {
                 supportedLanguagesListeners.addLast(responseListener);
             }
             if (getSupportedLanguageThread == null) {
-                getSupportedLanguageThread = new Thread(new GetSupportedLanguageRunnable(context, new SupportedLanguagesListener() {
+                getSupportedLanguageThread = new Thread(new GetSupportedLanguageRunnable(context, new TTS.SupportedLanguagesListener() {
                     @Override
-                    public void onLanguagesListAvailable(ArrayList<CustomLocale> languages) {
+                    public void onLanguagesListAvailable(java.util.ArrayList<CustomLocale> languages) {
                         notifyGetSupportedLanguagesSuccess(languages);
                     }
 

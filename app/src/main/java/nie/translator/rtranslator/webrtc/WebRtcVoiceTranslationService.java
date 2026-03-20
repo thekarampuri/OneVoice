@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import android.media.AudioAttributes;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
@@ -309,6 +310,14 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
 
         signalingClient = new SignalingClient(serverUrl, this);
         signalingClient.connect(callId, userId);
+
+        // --- CONFIGURE TTS FOR CALL ---
+        AudioAttributes attributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+        setTtsAudioAttributes(attributes);
+        // ------------------------------
     }
 
     private void stopWebRtc() {
@@ -490,7 +499,7 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
         final String finalText = text;
         final CustomLocale sourceLanguage = CustomLocale.getInstance(languageCode);
 
-        global.getLanguage(false, new Global.GetLocaleListener() {
+        global.getLanguage(true, new Global.GetLocaleListener() {
             @Override
             public void onSuccess(CustomLocale myLanguage) {
                 ConversationMessage conversationMessage = new ConversationMessage(
@@ -563,8 +572,16 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     // -------------------------------------------------------------------------
 
     @Override
-    protected boolean shouldDeactivateMicDuringTTS() {
+    protected boolean isBluetoothHeadsetConnected() {
+        if (mVoiceRecorder != null) {
+            return mVoiceRecorder.isOnHeadsetSco();
+        }
         return false;
+    }
+
+    @Override
+    protected boolean shouldDeactivateMicDuringTTS() {
+        return !isBluetoothHeadsetConnected();
     }
 
     // -------------------------------------------------------------------------
