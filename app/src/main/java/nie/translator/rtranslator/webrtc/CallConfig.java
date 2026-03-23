@@ -24,7 +24,7 @@ public final class CallConfig {
      * Do NOT include a protocol prefix – SignalingClient adds ws:// itself.
      * Example: "192.168.31.29:8001"
      */
-    public static final String SIGNALING_SERVER_URL = "https://7289-160-30-85-53.ngrok-free.app";
+    public static final String SIGNALING_SERVER_URL = "https://lilliam-tauriform-jaida.ngrok-free.dev";
 
     // -----------------------------------------------------------------------
     // ICE Servers (STUN + TURN)
@@ -34,11 +34,17 @@ public final class CallConfig {
     public static final String STUN_SERVER_1 = "stun:stun.l.google.com:19302";
     public static final String STUN_SERVER_2 = "stun:stun1.l.google.com:19302";
 
-    /** Free public OpenRelay TURN servers (no expiration). */
-    public static final String TURN_SERVER_URL_1 = "turn:openrelay.metered.ca:80";
-    public static final String TURN_SERVER_URL_2 = "turn:openrelay.metered.ca:443";
-    public static final String TURN_USERNAME = "openrelayproject";
-    public static final String TURN_CREDENTIAL = "openrelayproject";
+    /**
+     * Free TURN servers from metered.ca (reliable, no expiration).
+     * These cover UDP (port 80), TCP (port 80), and TLS (port 443) to maximize
+     * NAT traversal success when devices are on different networks.
+     */
+    public static final String TURN_SERVER_URL_1 = "turn:a.relay.metered.ca:80";
+    public static final String TURN_SERVER_URL_2 = "turn:a.relay.metered.ca:80?transport=tcp";
+    public static final String TURN_SERVER_URL_3 = "turn:a.relay.metered.ca:443";
+    public static final String TURN_SERVER_URL_4 = "turns:a.relay.metered.ca:443?transport=tcp";
+    public static final String TURN_USERNAME = "e3ee672d1f7e70a96df05db9";
+    public static final String TURN_CREDENTIAL = "mJP0LlEEj4nGDa6y";
 
     // -----------------------------------------------------------------------
     // DataChannel

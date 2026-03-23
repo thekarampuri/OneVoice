@@ -57,6 +57,14 @@ class WebRtcClient(
         PeerConnection.IceServer.builder(CallConfig.TURN_SERVER_URL_2)
             .setUsername(CallConfig.TURN_USERNAME)
             .setPassword(CallConfig.TURN_CREDENTIAL)
+            .createIceServer(),
+        PeerConnection.IceServer.builder(CallConfig.TURN_SERVER_URL_3)
+            .setUsername(CallConfig.TURN_USERNAME)
+            .setPassword(CallConfig.TURN_CREDENTIAL)
+            .createIceServer(),
+        PeerConnection.IceServer.builder(CallConfig.TURN_SERVER_URL_4)
+            .setUsername(CallConfig.TURN_USERNAME)
+            .setPassword(CallConfig.TURN_CREDENTIAL)
             .createIceServer()
     )
 
@@ -403,7 +411,6 @@ class WebRtcClient(
 
         override fun onIceConnectionChange(state: PeerConnection.IceConnectionState?) {
             state?.let {
-                Log.d(tag, "🔌 ICE state: $it")
                 listener.onConnectionStateChanged(it)
             }
         }
@@ -423,6 +430,10 @@ class WebRtcClient(
             if (dc != null && dc.label() == "translation") {
                 dataChannel = dc
                 dataChannel?.registerObserver(dataChannelObserver)
+                // If it's already OPEN, the observer might not get onStateChange(OPEN). Trigger it manually.
+                if (dc.state() == DataChannel.State.OPEN) {
+                    dataChannelObserver.onStateChange()
+                }
             }
         }
 

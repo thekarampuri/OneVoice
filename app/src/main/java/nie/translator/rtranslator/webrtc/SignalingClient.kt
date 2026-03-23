@@ -107,6 +107,24 @@ class SignalingClient(
         sendMessage(PeerInfoMessage(callId = callId, name = name, avatar = avatar))
     }
 
+    /**
+     * Send translated text via signaling server WebSocket.
+     * This bypasses the WebRTC DataChannel and routes through the server,
+     * which works even when P2P ICE fails (e.g. AP Isolation / no TURN).
+     */
+    fun sendTranslation(callId: String, text: String, lang: String) {
+        val msg = com.google.gson.JsonObject().apply {
+            addProperty("type", "translation")
+            addProperty("callId", callId)
+            addProperty("text", text)
+            addProperty("lang", lang)
+        }
+        val json = msg.toString()
+        Log.d(tag, "📤 Sending (WS relay): translation  lang=$lang")
+        val ok = webSocket?.send(json) ?: false
+        if (!ok) Log.e(tag, "Failed to send translation via WebSocket")
+    }
+
     /** Disconnect and release resources. */
     fun disconnect() {
         Log.d(tag, "Disconnecting…")
@@ -183,6 +201,13 @@ class SignalingClient(
                     listener.onPeerInfoReceived(name, avatar)
                 }
 
+                "translation" -> {
+                    val text = json.get("text")?.asString ?: return
+                    val lang = json.get("lang")?.asString ?: "und"
+                    Log.d(tag, "💬 Translation received via WS relay: lang=$lang")
+                    listener.onTranslationReceived(text, lang)
+                }
+
                 "peer-left" -> {
                     val peerId = json.get("peerId")?.asString ?: return
                     Log.d(tag, "👋 Peer left: $peerId")
@@ -193,6 +218,11 @@ class SignalingClient(
                     val msg = json.get("message")?.asString ?: "Unknown error"
                     Log.e(tag, "⚠️ Server error: $msg")
                     listener.onError(msg)
+                }
+
+                "ping" -> {
+                    // Log minimally to avoid spam
+                    // Log.v(tag, "🏓 Ping received")
                 }
 
                 else -> Log.w(tag, "Unknown message type: $type")
@@ -207,7 +237,7 @@ class SignalingClient(
      * Build WebSocket URL:  ws://<host:port>/ws/<callId>/<userId>
      */
     private fun buildWebSocketUrl(serverUrl: String, callId: String, userId: String): String {
-        val clean = serverUrl
+        val clean = serverUrl.trim()
             .replace(Regex("^(http://|https://|ws://|wss://|/+)"), "")
             .trimEnd('/')
         return "wss://$clean/ws/$callId/$userId"
@@ -228,4 +258,6 @@ interface SignalingListener {
     fun onPeerLeft(peerId: String)
     fun onDisconnected()
     fun onError(error: String)
+    /** Called when the peer sends a translated text message via WS relay. */
+    fun onTranslationReceived(text: String, lang: String) {}
 }

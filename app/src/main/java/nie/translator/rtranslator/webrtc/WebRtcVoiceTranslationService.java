@@ -5,13 +5,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
-import android.media.AudioAttributes;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
@@ -28,6 +29,7 @@ import nie.translator.rtranslator.voice_translation.VoiceTranslationActivity;
 import nie.translator.rtranslator.Global;
 import nie.translator.rtranslator.tools.CustomLocale;
 import nie.translator.rtranslator.tools.BluetoothHeadsetUtils;
+import nie.translator.rtranslator.tools.TTS;
 import nie.translator.rtranslator.tools.Tools;
 import nie.translator.rtranslator.tools.gui.messages.GuiMessage;
 import nie.translator.rtranslator.voice_translation.VoiceTranslationService;
@@ -100,6 +102,7 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     public void onCreate() {
         super.onCreate();
         global = (Global) getApplication();
+        translator = global.getTranslator();
         mainHandler = new Handler(Looper.getMainLooper());
 
         // ----- Voice recorder callback (same as ConversationService) -----
@@ -205,10 +208,30 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
                 }
             }
         };
-        mVoiceRecognizer.addCallback(mVoiceRecognizerCallback);
+        if (mVoiceRecognizer != null) {
+            mVoiceRecognizer.addCallback(mVoiceRecognizerCallback);
+        } else {
+            Log.e(TAG, "Speech Recognizer is null! Initialization failed.");
+        }
 
-        translator = global.getTranslator();
         initializeVoiceRecorder();
+        
+        // Re-initialize TTS with our own listener to ensure audio routing is set upon readiness
+        tts = new TTS(this, new TTS.InitListener() {
+            @Override
+            public void onInit() {
+                if (tts != null) {
+                    tts.setOnUtteranceProgressListener(ttsListener);
+                    configureAudioRouting();
+                }
+            }
+            @Override
+            public void onError(int reason) {
+                tts = null;
+                notifyError(new int[]{reason}, -1);
+                isAudioMute = true;
+            }
+        });
     }
 
     @Override
@@ -310,14 +333,6 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
 
         signalingClient = new SignalingClient(serverUrl, this);
         signalingClient.connect(callId, userId);
-
-        // --- CONFIGURE TTS FOR CALL ---
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .build();
-        setTtsAudioAttributes(attributes);
-        // ------------------------------
     }
 
     private void stopWebRtc() {
@@ -339,6 +354,25 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     @Override
     public void onConnected() {
         Log.d(TAG, "✅ Signaling connected");
+        configureAudioRouting();
+        sendLocalPeerInfo();
+    }
+
+    private void configureAudioRouting() {
+        Log.d(TAG, "🔊 Configuring audio routing (speakerphone, voice communication mode)...");
+        android.media.AudioManager audioManager = (android.media.AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+        if (audioManager != null) {
+            audioManager.setMode(android.media.AudioManager.MODE_IN_COMMUNICATION);
+            audioManager.setSpeakerphoneOn(true);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build();
+            setTtsAudioAttributes(audioAttributes);
+        }
     }
 
     /**
@@ -476,13 +510,12 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     }
 
     /**
-     * Incoming translated-text from the remote peer via DataChannel.
-     * Parse text + language code, translate locally (to user's language),
-     * and speak via TTS — identical to the old
-     * ConversationService.onMessageReceived flow.
+     * Incoming translated-text from the remote peer via DataChannel (fallback).
+     * Parse text + language code and delegate to processIncomingTranslation.
      */
     @Override
     public void onTranslationReceived(String rawMessage) {
+        Log.d(TAG, "📥 Translation received via DataChannel: " + rawMessage.substring(0, Math.min(60, rawMessage.length())));
         String text;
         String languageCode;
 
@@ -491,19 +524,24 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
             text = rawMessage.substring(0, idx);
             languageCode = rawMessage.substring(idx + CallConfig.MESSAGE_SEPARATOR.length());
         } else {
-            // Fallback: no separator
             text = rawMessage;
             languageCode = "en";
         }
+        processIncomingTranslation(text, languageCode);
+    }
 
-        final String finalText = text;
+    /**
+     * Core processing for incoming translated text — shared by both DataChannel
+     * and WebSocket relay paths.
+     */
+    private void processIncomingTranslation(String text, String languageCode) {
         final CustomLocale sourceLanguage = CustomLocale.getInstance(languageCode);
 
         global.getLanguage(true, new Global.GetLocaleListener() {
             @Override
             public void onSuccess(CustomLocale myLanguage) {
                 ConversationMessage conversationMessage = new ConversationMessage(
-                        new NeuralNetworkApiText(finalText, sourceLanguage));
+                        new NeuralNetworkApiText(text, sourceLanguage));
 
                 translator.translateMessage(conversationMessage, myLanguage, TRANSLATOR_BEAM_SIZE,
                         new Translator.TranslateMessageListener() {
@@ -519,7 +557,7 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
                                                 speak(cm.getPayload().getText(), cm.getPayload().getLanguage());
                                             }
                                         }
-                                        Message msg = new Message(global, finalText);
+                                        Message msg = new Message(global, text);
                                         msg.setText(cm.getPayload().getText());
                                         GuiMessage guiMessage = new GuiMessage(msg, messageID, false, isFinal);
                                         notifyMessage(guiMessage);
@@ -546,6 +584,19 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
         });
     }
 
+    /**
+     * Incoming translated text from the remote peer via WebSocket relay.
+     * This is the SignalingListener override (WS relay path).
+     * Delegates to the same processing logic as the DataChannel path.
+     */
+    @Override
+    public void onTranslationReceived(String text, String lang) {
+        Log.d(TAG, "📥 WS relay translation received: lang=" + lang
+                + "  text=" + text.substring(0, Math.min(60, text.length())));
+        processIncomingTranslation(text, lang);
+    }
+
+
     @Override
     public void onCallEndedByPeer() {
         Log.d(TAG, "📡 onCallEndedByPeer: Remote peer ended the call — terminating immediately.");
@@ -557,11 +608,9 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
             android.widget.Toast.makeText(this, "The remote user ended the call.", android.widget.Toast.LENGTH_LONG)
                     .show();
             // This forces VoiceTranslationActivity to fall back similarly to disconnected
-            if (global.getBluetoothCommunicator() != null) {
-                Intent intent = new Intent(this, VoiceTranslationActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(this, VoiceTranslationActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         });
     }
 
@@ -572,16 +621,17 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     // -------------------------------------------------------------------------
 
     @Override
-    protected boolean isBluetoothHeadsetConnected() {
-        if (mVoiceRecorder != null) {
-            return mVoiceRecorder.isOnHeadsetSco();
-        }
-        return false;
+    protected boolean shouldDeactivateMicDuringTTS() {
+        return false; // return false for full-duplex (microphone stays active during TTS)
     }
 
     @Override
-    protected boolean shouldDeactivateMicDuringTTS() {
-        return !isBluetoothHeadsetConnected();
+    protected boolean isBluetoothHeadsetConnected() {
+        if (mVoiceRecorder != null) {
+            return mVoiceRecorder.isOnHeadsetSco();
+        } else {
+            return false;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -589,19 +639,24 @@ public class WebRtcVoiceTranslationService extends VoiceTranslationService
     // -------------------------------------------------------------------------
 
     /**
-     * Send the locally recognized text to the remote peer through the DataChannel.
-     * The RECEIVER is responsible for translating it into their own language.
+     * Send the locally recognized text to the remote peer.
+     * PRIMARY path: WebSocket relay via signaling server (works even when ICE fails).
+     * FALLBACK: DataChannel (if WebRTC peer connection succeeded).
      *
-     * Format: "<original_recognized_text>|||<source_language_code>"
-     *
-     * This replaces the old approach of translating on the sender side (which used
-     * getLanguage() = the sender's OWN language as the target, producing a no-op).
+     * Format sent via WS: type=translation, text=<original>, lang=<bcp47>
      */
     private void sendTranslationViaPeer(String originalText, CustomLocale sourceLanguage) {
-        if (webRtcClient != null && originalText != null && !originalText.isEmpty()) {
-            Log.d(TAG, "📤 Sending raw text to peer: lang=" + sourceLanguage.getCode()
-                    + "  text=" + originalText.substring(0, Math.min(40, originalText.length())));
-            webRtcClient.sendTranslationMessage(originalText, sourceLanguage.getCode());
+        if (originalText == null || originalText.isEmpty()) return;
+        String lang = sourceLanguage != null ? sourceLanguage.getCode() : "und";
+        Log.d(TAG, "📤 Sending text to peer (WS relay): lang=" + lang
+                + "  text=" + originalText.substring(0, Math.min(40, originalText.length())));
+        if (signalingClient != null) {
+            // Primary: always try WS relay (reliable, works through server)
+            signalingClient.sendTranslation(callId, originalText, lang);
+        }
+        if (webRtcClient != null) {
+            // Fallback: also try DataChannel (if ICE succeeded)
+            webRtcClient.sendTranslationMessage(originalText, lang);
         }
     }
 

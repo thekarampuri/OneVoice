@@ -159,10 +159,12 @@ async def websocket_endpoint(websocket: WebSocket, call_id: str, user_id: str):
                     continue
                 
                 # Relay message to peer
-                if msg_type in ["offer", "answer", "ice-candidate", "peer-info"]:
+                if msg_type in ["offer", "answer", "ice-candidate", "peer-info", "translation"]:
                     success = await send_to_peer(call_id, user_id, message)
                     if not success:
                         log(f"⚠️  Failed to relay {msg_type} from {user_id[:8]} (peer not found)")
+                elif msg_type == "ping":
+                    pass  # client-side ping, ignore silently
                 else:
                     log(f"⚠️  Unknown message type from {user_id[:8]}: {msg_type}")
                     

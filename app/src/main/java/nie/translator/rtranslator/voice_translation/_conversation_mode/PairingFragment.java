@@ -38,6 +38,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import java.util.UUID;
 import nie.translator.rtranslator.Global;
 import nie.translator.rtranslator.R;
+import nie.translator.rtranslator.voice_translation.neural_networks.NeuralNetworkApi;
 import nie.translator.rtranslator.settings.SettingsActivity;
 import nie.translator.rtranslator.tools.Tools;
 import nie.translator.rtranslator.voice_translation.VoiceTranslationActivity;
@@ -136,7 +137,33 @@ public class PairingFragment extends PairingToolbarFragment {
      */
     private void joinCall(String callId) {
         Log.d("PairingFragment", "Joining call: " + callId);
-        String userId = ((Global) activity.getApplication()).getMyPeer().getUniqueName();
+        Global global = (Global) activity.getApplication();
+
+        // Ensure translation and recognition engines are initialized
+        global.initializeSpeechRecognizer(new nie.translator.rtranslator.voice_translation.neural_networks.NeuralNetworkApi.InitListener() {
+            @Override
+            public void onInitializationFinished() {
+                Log.d("PairingFragment", "Speech Recognizer initialized");
+            }
+
+            @Override
+            public void onError(int[] reasons, long value) {
+                Log.e("PairingFragment", "Speech Recognizer init error: " + (reasons != null && reasons.length > 0 ? reasons[0] : -1));
+            }
+        });
+        global.initializeTranslator(new nie.translator.rtranslator.voice_translation.neural_networks.NeuralNetworkApi.InitListener() {
+            @Override
+            public void onInitializationFinished() {
+                Log.d("PairingFragment", "Translator initialized");
+            }
+
+            @Override
+            public void onError(int[] reasons, long value) {
+                Log.e("PairingFragment", "Translator init error: " + (reasons != null && reasons.length > 0 ? reasons[0] : -1));
+            }
+        });
+
+        String userId = global.getMyPeer().getUniqueName();
 
         Intent serviceIntent = new Intent(activity, WebRtcVoiceTranslationService.class);
         serviceIntent.putExtra(WebRtcVoiceTranslationService.EXTRA_CALL_ID, callId);

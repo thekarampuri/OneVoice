@@ -111,6 +111,7 @@ public abstract class VoiceTranslationService extends GeneralService {
     protected boolean manualRecognizingFirstLanguage = false;
     protected boolean manualRecognizingSecondLanguage = false;
     protected boolean manualRecognizingAutoLanguage = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -293,12 +294,10 @@ public abstract class VoiceTranslationService extends GeneralService {
     }
 
     public int setTtsAudioAttributes(android.media.AudioAttributes attributes) {
-        synchronized (mLock) {
-            if (tts != null) {
-                return tts.setAudioAttributes(attributes);
-            }
-            return android.speech.tts.TextToSpeech.ERROR;
+        if (tts != null) {
+            return tts.setAudioAttributes(attributes);
         }
+        return TextToSpeech.ERROR;
     }
 
     protected boolean shouldDeactivateMicDuringTTS() {
